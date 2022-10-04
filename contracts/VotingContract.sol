@@ -4,17 +4,18 @@ import "../node_modules/hardhat/console.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
 contract Create {
-    //This is the way we use plugins in our smart contracts.useing 'contract-name' for 'function-we-want-to-use'
+    //This is the way we use plugins in our smart contracts:`using 'contract-name' for 'function-we-want-to-use'`
     // make sure you use the same name;
     using Counters for Counters.Counter;
 
-    Counters.Counter public _voterId;
-    Counters.Counter public _candidateId;
+    Counters.Counter public _candidateId; //* To keep a count on candidateId
+    Counters.Counter public _voterId; //* To keep a count on voterId
 
     address public votingOrganizer;
 
-    //Todo:
-    //---- Candidate for the vote ----
+    //! -------------------------------------------- CANDIDATE DATA --------------------------------------------//
+
+    //Todo: Setting up struct----//
     struct Candidate {
         uint candidateId;
         string age;
@@ -22,9 +23,11 @@ contract Create {
         string image; //From IPFS we are going to add the image
         uint voteCount;
         address _address;
-        string ipfs; //IPFS going to contain all the informations about the candidate, we will upload the entire data to the ipfs and fetch and add as an url. Anyone wants to know more about the candidate they can go to the link and learn about the canditate along with all details.7
+        string ipfs; //IPFS going to contain all the informations about the candidate, we will upload the entire data to the ipfs and fetch and add as an url. Anyone wants to know more about the candidate they can go to the link and learn about the canditate along with all details.
     }
 
+    //Todo: To fire an event----//
+    //Todo: To fire an event----//
     event CandidateCreate(
         uint indexed candidateId,
         string age,
@@ -35,15 +38,15 @@ contract Create {
         string ipfs
     );
 
-    address[] public candidateAddress;
+    address[] public candidateAddress; //? Creating an array of candidate address
 
-    mapping(address => Candidate) public candidates;
+    mapping(address => Candidate) public candidates; //? Creating mapping of 'candidate' struct with address.
 
-    //---End of candidate data---
+    //! -------------------------------------------- End of Candidate Data ------------------------------------------------//
 
-    // ---- VOTER DATA ----
-    address[] public votedVoters;
+    //! ------------------------------------------------- Voter Data  -------------------------------------------------- //
     address[] public votersAddress;
+    address[] public votedVoters;
 
     struct Voter {
         uint voter_voterId;
@@ -55,7 +58,8 @@ contract Create {
         uint voter_vote;
         string voter_ipfs;
     }
-    mapping(address => Voter) public voters;
+
+    mapping(address => Voter) public voters; //?  Creating an mapping of 'Candidate' struct
 
     event VoterCreated(
         uint voter_voterId,
@@ -68,8 +72,9 @@ contract Create {
         string voter_ipfs
     );
 
-    //----End of voter data----
+    //! ---- -----------------------------------------------End of voter data--------------------------------------------------//
 
+    //! ---- ----------------------------------------------- Functions Start --------------------------------------------------//
     constructor() {
         votingOrganizer = msg.sender;
     }
@@ -87,12 +92,13 @@ contract Create {
             "Only organizer can create candidature"
         );
 
-        _candidateId.increment(); //calling this function from 'counter.sol'
+        _candidateId.increment(); //inceases candidateId by 1 after callinog this function.
 
         uint idNumber = _candidateId.current();
 
-        Candidate storage candidate = candidates[_address]; //assigning the mapping using struct
+        Candidate storage candidate = candidates[_address]; //Assigning the 'candidates' mapping using struct.
 
+        
         candidate.age = _age;
         candidate.name = _name;
         candidate.candidateId = idNumber;
@@ -136,6 +142,7 @@ contract Create {
         )
     {
         return (
+            // Will be accessed by 'candidates' mapping.
             candidates[_address].age,
             candidates[_address].name,
             candidates[_address].candidateId,
@@ -146,7 +153,7 @@ contract Create {
         );
     }
 
-    //!'Tuple component can not be empty' means somewhere there is an extra ','
+    //!CLI fError: 'Tuple component can not be empty' means somewhere there is an extra ','
 
     //----Voter section----
     function voterRight(
@@ -238,3 +245,5 @@ contract Create {
         return votersAddress;
     }
 }
+
+
